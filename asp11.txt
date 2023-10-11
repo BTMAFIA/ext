@@ -1,0 +1,107 @@
+Imports System.Data.SqlClient
+Imports System.Data
+Partial Class _Default
+    Inherits System.Web.UI.Page
+    Dim con As New SqlConnection("Data Source=.\SQLEXPRESS;AttachDbFilename=C:\Users\ABC\Documents\Visual Studio 2008\WebSites\visitors\App_Data\Database5.mdf;Integrated Security=True;User Instance=True")
+
+    Protected Sub btnInsert_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInsert.Click
+        con.Open()
+        Dim stmt As String = "insert into visitors1(name, time, date, contact, gender) values('" & tbName.Text & "', '" & tbTime.Text & "', '" & tbDate.Text & "', '" & tbContact.Text & "', '" & tbGender.Text & "')"
+        Dim cmd As New SqlCommand(stmt, con)
+        cmd.ExecuteNonQuery()
+        MsgBox("Success")
+        tbName.Text = ""
+        tbTime.Text = ""
+        tbDate.Text = ""
+        tbContact.Text = ""
+        tbGender.Text = ""
+        con.Close()
+
+    End Sub
+
+    Protected Sub tbTime_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbTime.Load
+        tbTime.Text = TimeOfDay
+    End Sub
+
+    Protected Sub tbDate_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbDate.Load
+        Dim dt As Date = Date.Today
+        tbDate.Text = Format(dt, "dd-MM-yyyy")
+    End Sub
+
+    Public Sub bind()
+        Dim stmt As String = "select * from visitors1 where date = '" & tbDate.Text & "'"
+        Dim cmd As New SqlCommand(stmt, con)
+        Dim da As New SqlDataAdapter(cmd)
+        Dim dt As New DataTable
+        da.Fill(dt)
+        GridView1.DataSource = dt
+        GridView1.DataBind()
+    End Sub
+
+    Protected Sub btnDisplay_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDisplay.Click
+        bind()
+    End Sub
+
+    Protected Sub btnSearch_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearch.Click
+        con.Open()
+        Dim stmt As String = "select * from visitors1 where name = '" & tbName.Text & "'"
+        Dim cmd As New SqlCommand(stmt, con)
+        Dim dr As SqlDataReader
+        dr = cmd.ExecuteReader
+
+        Try
+            If dr.Read Then
+                tbName.Text = dr.GetValue(0)
+                tbTime.Text = dr.GetValue(1)
+                tbDate.Text = dr.GetValue(2)
+                tbContact.Text = dr.GetValue(3)
+                tbGender.Text = dr.GetValue(4)
+
+            Else
+                MsgBox("Not found")
+            End If
+            tbName.Text = ""
+            tbTime.Text = ""
+            tbDate.Text = ""
+            tbContact.Text = ""
+            tbGender.Text = ""
+
+        Catch ex As Exception
+            MsgBox("No values")
+        End Try
+
+
+        
+        con.Close()
+
+
+    End Sub
+
+    Protected Sub btnUpdate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnUpdate.Click
+        con.Open()
+        Dim stmt As String = "update visitors1 set time = '" & tbTime.Text & "', date = '" & tbDate.Text & "', contact = '" & tbContact.Text & "', gender = '" & tbGender.Text & "' where name = '" & tbName.Text & "'"
+        Dim cmd As New SqlCommand(stmt, con)
+        cmd.ExecuteNonQuery()
+        MsgBox("Success")
+        con.Close()
+        tbName.Text = ""
+        tbTime.Text = ""
+        tbDate.Text = ""
+        tbContact.Text = ""
+        tbGender.Text = ""
+    End Sub
+
+    Protected Sub btnDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDelete.Click
+        con.Open()
+        Dim stmt As String = "delete from visitors1 where name = '" & tbName.Text & "'"
+        Dim cmd As New SqlCommand(stmt, con)
+        cmd.ExecuteNonQuery()
+        MsgBox("Success")
+        tbName.Text = ""
+        tbTime.Text = ""
+        tbDate.Text = ""
+        tbContact.Text = ""
+        tbGender.Text = ""
+        con.Close()
+    End Sub
+End Class
